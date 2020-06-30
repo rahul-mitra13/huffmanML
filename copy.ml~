@@ -1,0 +1,41 @@
+(*Rahul Mitra
+*CPSC,316
+*Huffman Code*)
+
+(*Definition of node datatype*)
+datatype tree =
+  Empty
+ | Node of tree * char * int * tree
+ | Leaf of char * int;
+
+
+(*A function to find thse frequency of a tree*)
+fun frequency(Leaf(_, f)) = f
+  | frequency(Node(_,_,f, _)) = f;
+
+(*This list should be a tree.This can be in any order*)
+val L = [Leaf(#"E", 13),Leaf(#"T", 9), Leaf(#"I", 8), Leaf(#"O", 8), Leaf(#"N", 6), Leaf(#"S", 6), Leaf(#"R", 6), Leaf(#"H", 6), Leaf(#"D", 4), Leaf(#"L",4), Leaf(#"U", 3), Leaf(#"W", 3),Leaf(#"M", 2),Leaf(#"C", 2), Leaf(#"F", 2), Leaf(#"G", 2), Leaf(#"P", 2), Leaf(#"Y", 2),Leaf(#"B", 1), Leaf(#"K", 1), Leaf(#"V", 1), Leaf(#"X", 1),Leaf(#"J",1),  Leaf(#"Z", 0),Leaf(#"Q", 0)];
+
+
+fun insert _ to_Insert [] = [to_Insert]
+| insert f to_Insert (t1 :: ts) = if f < frequency t1 then t1 :: to_Insert :: ts 
+else t1 :: (insert f to_Insert ts);
+
+fun build_tree [t] = t
+| build_tree(t1 :: t2 :: ts) =
+let val f = frequency t1 + frequency t2
+val new_tree = insert f (Node(t1, #"@",f, t2)) ts
+in 
+ build_tree new_tree
+end;
+
+val huff_tree = build_tree L;
+
+
+fun make_code (Leaf(a,b), Leaf(x,y), L) = x = a
+ | make_code (Leaf(c,d), Node(left,random,mid,right), L) =
+              c = random
+              orelse make_code(Leaf(c,d), left, 0 :: L)
+              orelse make_code(Leaf(c,d), right, 1 :: L);
+              
+make_code (Leaf(#"K", 13), huff_tree, []);
